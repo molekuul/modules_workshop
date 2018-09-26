@@ -19,16 +19,16 @@ module: demo
 short_description: demo module
 description:
     - demo module for the Ansible meetup benelux
-version_added: "2.6"
+version_added: "2.7"
 options:
   name:
-    desciption:
+    description:
     - Name of the file
-    required: no
+    required: yes
   location:
     description:
     - Location of the file
-    required: yes
+    default: /tmp
   state:
     description:
     - whether the file should be present or absent
@@ -58,9 +58,9 @@ EXAMPLES = '''
 RETURN = '''
 msg:
     description: return message
-    returned: changed
+    returned: always
     type: string
-    sample: file added
+    sample: file: /tmp/hello_world created
 changed:
     description: whether the file add or removal has been changed
     returned: always
@@ -72,6 +72,7 @@ changed:
 
 # Import necessary libraries
 from ansible.module_utils.basic import AnsibleModule
+
 
 # end import modules
 # start defining the functions
@@ -88,13 +89,36 @@ def check_file(module, full_path_name):
     return existsdict
 
 
-def create_file(module):
+def create_file(module, full_path_name):
     # create file
-    # uses touch tou create a file
+    # uses touch to create a file
+    result = {}
+    touch = module.get_bin_path("touch")
+    (rc, out, err) = module.run_command([touch, full_path_name])
+    if rc == 0:
+        result['changed']=True
+        result['msg']="file: " + full_path_name + " created"
+    else:
+        module.fail_json(
+                msg="could not create " + full_path_name, rc=rc, err=err)
+    return result
 
-def remove_file(module):
+
+
+def remove_file(module, full_path_name):
     # remove file
     # uses rm to remove file
+    result = {}
+    rm = module.get_bin_path("rm")
+    (rc, out, err) = module.run_command([rm, full_path_name])
+    if rc == 0:
+        result['changed']=True
+        result['msg']="file: " + full_path_name + " removed"
+    else:
+        module.fail_json(
+                msg="could not remove " + full_path_name, rc=rc, err=err)
+    return result
+
 
 def main():
     module = AnsibleModule(
@@ -103,16 +127,16 @@ def main():
             location=dict(type='str', default='/tmp'),
             state=dict(type='str', choices=['absent', 'present' ], default='present'),
         ),
-        support_check_mode=True,
+        supports_check_mode=True,
     )
 
     result = { 
-            'msg': "",
-            'changed': False
+        'msg': "",
+        'changed': False
     }
 
     # check if file exists
-    full_path_name = module['location'] + "/" + module['name'] 
+    full_path_name = module.params['location'] + "/" + module.params['name'] 
     current_file = check_file(module, full_path_name)
 
     # if state is present and file does not exist create file
@@ -122,10 +146,10 @@ def main():
             
     if module.params['state'] == 'present':
         if (not current_file['exists']):
-            create_file(module, full_path_name)
+            result = create_file(module, full_path_name)
     else:
         if ( current_file['exists']):
-            remove_file(module, full_path_name)
+            result = remove_file(module, full_path_name)
 
     module.exit_json(**result)
 

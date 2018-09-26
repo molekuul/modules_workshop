@@ -1,0 +1,16 @@
+---
+- name: test
+  hosts: all
+
+  tasks:
+    - name: Add a file
+      demo:
+        name: "hello_world"
+        location: /tmp
+
+#    - name: remove file
+#      demo:
+#        name: "hello_world"
+#        location: /tmp
+#        state: absent
+...
