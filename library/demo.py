@@ -2,11 +2,16 @@
 # -*- coding: utf-8 -*-
 
 # (c) 2017, Joris Weijters <joris.weijters@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+
+# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+# Import necessary libraries
+from ansible.module_utils.basic import AnsibleModule
+
+# end import modules
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'status': ['preview'],
                     'supported_by': 'community'}
@@ -34,14 +39,13 @@ options:
     - whether the file should be present or absent
     choices: [ absent, present ]
     default: present
-    
 notes:
   - puts a file at a specific location
   - this is just to demo the writing of modules
 '''
 
 EXAMPLES = '''
-# Add a file 
+# Add a file
 - name: Add a file
   demo:
     name: "hello_world"
@@ -68,14 +72,8 @@ changed:
     sample: true
 '''
 
-
-
-# Import necessary libraries
-from ansible.module_utils.basic import AnsibleModule
-
-
-# end import modules
 # start defining the functions
+
 
 def check_file(module, full_path_name):
     # check if file exists
@@ -96,13 +94,12 @@ def create_file(module, full_path_name):
     touch = module.get_bin_path("touch")
     (rc, out, err) = module.run_command([touch, full_path_name])
     if rc == 0:
-        result['changed']=True
-        result['msg']="file: " + full_path_name + " created"
+        result['changed'] = True
+        result['msg'] = "file: " + full_path_name + " created"
     else:
         module.fail_json(
                 msg="could not create " + full_path_name, rc=rc, err=err)
     return result
-
 
 
 def remove_file(module, full_path_name):
@@ -112,8 +109,8 @@ def remove_file(module, full_path_name):
     rm = module.get_bin_path("rm")
     (rc, out, err) = module.run_command([rm, full_path_name])
     if rc == 0:
-        result['changed']=True
-        result['msg']="file: " + full_path_name + " removed"
+        result['changed'] = True
+        result['msg'] = "file: " + full_path_name + " removed"
     else:
         module.fail_json(
                 msg="could not remove " + full_path_name, rc=rc, err=err)
@@ -125,33 +122,35 @@ def main():
         argument_spec=dict(
             name=dict(type='str', required=True),
             location=dict(type='str', default='/tmp'),
-            state=dict(type='str', choices=['absent', 'present' ], default='present'),
+            state=dict(type='str', choices=['absent', 'present'],
+                       default='present'),
         ),
         supports_check_mode=True,
     )
 
-    result = { 
+    result = {
         'msg': "",
         'changed': False
     }
 
     # check if file exists
-    full_path_name = module.params['location'] + "/" + module.params['name'] 
+    full_path_name = module.params['location'] + "/" + module.params['name']
     current_file = check_file(module, full_path_name)
 
     # if state is present and file does not exist create file
     # if state is present and file does exist do nothing
     # if state is absent and file does not exist do nothing
     # if state is absent and file does exist remove file
-            
+
     if module.params['state'] == 'present':
         if (not current_file['exists']):
             result = create_file(module, full_path_name)
     else:
-        if ( current_file['exists']):
+        if (current_file['exists']):
             result = remove_file(module, full_path_name)
 
     module.exit_json(**result)
+
 
 if __name__ == '__main__':
     main()
