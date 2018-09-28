@@ -1,77 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-
-# (c) 2017, Joris Weijters <joris.weijters@gmail.com>
-# GNU General Public License v3.0+
-# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-DOCUMENTATION = '''
----
-author:
-- Joris Weijters (@molekuul)
-module: demo
-short_description: demo module
-description:
-    - demo module for the Ansible meetup benelux
-version_added: "2.7"
-options:
-  name:
-    description:
-    - Name of the file
-    required: yes
-  location:
-    description:
-    - Location of the file
-    default: /tmp
-  state:
-    description:
-    - whether the file should be present or absent
-    choices: [ absent, present ]
-    default: present
-notes:
-  - puts a file at a specific location
-  - this is just to demo the writing of modules
-'''
-
-EXAMPLES = '''
-# Add a file
-- name: Add a file
-  demo:
-    name: "hello_world"
-    location: /tmp
-
-# remove a file
-- name: remove file
-  demo:
-    name: "hello_world"
-    location: /tmp
-    state: absent
-'''
-
-RETURN = '''
-msg:
-    description: return message
-    returned: always
-    type: string
-    sample: file /tmp/hello_world created
-changed:
-    description: whether the file add or removal has been changed
-    returned: always
-    type: boolean
-    sample: true
-'''
 
 # Import necessary libraries
 from ansible.module_utils.basic import AnsibleModule
-
-# end import modules
 
 # start defining the functions
 
@@ -126,7 +56,6 @@ def main():
             state=dict(type='str', choices=['absent', 'present'],
                        default='present'),
         ),
-        supports_check_mode=True,
     )
 
     result = {
