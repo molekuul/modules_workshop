@@ -1,0 +1,17 @@
+---
+- name: test
+  hosts: all
+  gather_facts: False
+
+  tasks:
+#    - name: Add a file
+#      demo2:
+#        name: "hello_world"
+#        location: /tmp
+
+    - name: remove file
+      demo2:
+        name: "hello_world"
+        location: /tmp
+        state: absent
+...

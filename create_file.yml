@@ -1,0 +1,11 @@
+---
+- name: create_file
+  hosts: all
+  gather_facts: False
+
+  tasks:
+    - name: Add a file
+      demo3:
+        name: "hello_world"
+        location: /tmp
+...

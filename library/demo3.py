@@ -21,9 +21,11 @@ def check_file(module, full_path_name):
 def create_file(module, full_path_name):
     # create file
     # uses touch to create a file
+    rc = 0
     result = {}
     touch = module.get_bin_path("touch")
-    (rc, out, err) = module.run_command([touch, full_path_name])
+    if not module.check_mode:
+        (rc, out, err) = module.run_command([touch, full_path_name])
     if rc == 0:
         result['changed'] = True
         result['msg'] = "file: " + full_path_name + " created"
@@ -36,9 +38,11 @@ def create_file(module, full_path_name):
 def remove_file(module, full_path_name):
     # remove file
     # uses rm to remove file
+    rc = 0
     result = {}
     rm = module.get_bin_path("rm")
-    (rc, out, err) = module.run_command([rm, full_path_name])
+    if not module.check_mode:
+        (rc, out, err) = module.run_command([rm, full_path_name])
     if rc == 0:
         result['changed'] = True
         result['msg'] = "file: " + full_path_name + " removed"
@@ -56,6 +60,7 @@ def main():
             state=dict(type='str', choices=['absent', 'present'],
                        default='present'),
         ),
+        supports_check_mode=True,
     )
 
     result = {

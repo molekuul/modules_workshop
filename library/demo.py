@@ -1,12 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # (c) 2017, Joris Weijters <joris.weijters@gmail.com>
-# GNU General Public License v3.0+
-# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'status': ['preview'],
@@ -80,12 +75,12 @@ def check_file(module, full_path_name):
     # check if file exists
     # uses ls to check if file exists
     # returns dictionary content is boolean exists:[ True, False ]
-    existsdict = {'exists': False}
+    exists = False
     ls = module.get_bin_path('ls')
     (rc, out, err) = module.run_command([ls, full_path_name])
     if rc == 0:
-        existsdict.update({'exists': True})
-    return existsdict
+        exists = True
+    return exists
 
 
 def create_file(module, full_path_name):
@@ -140,7 +135,7 @@ def main():
 
     # check if file exists
     full_path_name = module.params['location'] + "/" + module.params['name']
-    current_file = check_file(module, full_path_name)
+    file_exists = check_file(module, full_path_name)
 
     # if state is present and file does not exist create file
     # if state is present and file does exist do nothing
@@ -148,10 +143,10 @@ def main():
     # if state is absent and file does exist remove file
 
     if module.params['state'] == 'present':
-        if (not current_file['exists']):
+        if (not file_exists):
             result = create_file(module, full_path_name)
     else:
-        if (current_file['exists']):
+        if (file_exists):
             result = remove_file(module, full_path_name)
 
     module.exit_json(**result)
