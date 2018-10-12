@@ -1,0 +1,2 @@
+#  git should ignore these files
+*.pyc
