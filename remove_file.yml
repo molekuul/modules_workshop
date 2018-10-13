@@ -5,7 +5,7 @@
 
   tasks:
     - name: remove a file
-      demo3:
+      demo:
         name: "hello_world"
         location: /tmp
         state: absent

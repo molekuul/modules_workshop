@@ -1,0 +1,4 @@
+#ignore retry and .pyc files
+inventory
+*.retry
+*.pyc

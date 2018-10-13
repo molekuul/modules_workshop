@@ -9,9 +9,9 @@
         name: "hello_world"
         location: /tmp
 
-#    - name: remove file
-#      demo3:
-#        name: "hello_world"
-#        location: /tmp
-#        state: absent
+    - name: remove file
+      demo3:
+        name: "hello_world"
+        location: /tmp
+        state: absent
 ...
